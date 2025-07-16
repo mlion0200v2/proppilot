@@ -1,0 +1,29 @@
+# VSCode settings
+.vscode/
+*.code-workspace
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg
+*.egg-info/
+dist/
+build/
+env/
+venv/
+.venv/
+.idea/
+*.log
+
+# Conda
+*.conda
+*.ipynb_checkpoints
+
+# Environment variables / API keys
+.env
+
+# OS
+.DS_Store
+
+# Streamlit
+.streamlit/config.toml
