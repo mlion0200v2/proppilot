@@ -21,6 +21,14 @@ venv/
 
 # Environment variables / API keys
 .env
+credentials.json
+token.json
+
+# Data
+*.db
+*.sqlite
+*.log
+todo_list.json
 
 # OS
 .DS_Store
