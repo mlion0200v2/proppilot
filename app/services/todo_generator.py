@@ -35,5 +35,6 @@ Email content：
 
     return {
         "task": response.choices[0].message.content.strip(),
-        "due": (datetime.now() + timedelta(days=2)).date().isoformat()
+        "due": (datetime.now() + timedelta(days=2)).date().isoformat(),
+        "done": False
     }

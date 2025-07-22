@@ -19,9 +19,16 @@ def save_todos_to_file(todos, file_path=TODO_FILE):
     file_path.write_text(json.dumps(todos, indent=2))
 
 def load_all_todos(file_path=TODO_FILE):
-    if file_path.exists():
-        return json.loads(file_path.read_text())
-    return []
+    if not file_path.exists():
+        return []
+
+    try:
+        todos = json.loads(file_path.read_text())
+        assert isinstance(todos, list)
+        return todos
+    except Exception as e:
+        print("Failed to load todos:", e)
+        return []
 
 def load_todos_for_today(file_path: Path = TODO_FILE):
     if not file_path.exists():

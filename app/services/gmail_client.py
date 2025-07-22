@@ -5,20 +5,34 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 import base64
 import email
+from pathlib import Path
 
 SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
+CREDENTIALS_FILE = Path("credentials.json")
+TOKEN_FILE = Path("token.json")
 
 def get_service():
     creds = None
-    flow = InstalledAppFlow.from_client_secrets_file('credentials.json', SCOPES)
-    creds = flow.run_local_server(port=8080)
+    if TOKEN_FILE.exists():
+        creds = Credentials.from_authorized_user_file(str(TOKEN_FILE), SCOPES)
+    else:
+        flow = InstalledAppFlow.from_client_secrets_file(str(CREDENTIALS_FILE), SCOPES)
+        creds = flow.run_local_server(
+            port=8080,
+            access_type='offline',
+            include_granted_scopes='true'
+        )
+        with open(TOKEN_FILE, "w") as token:
+            token.write(creds.to_json())
+
     return build('gmail', 'v1', credentials=creds)
 
 def fetch_recent_emails(max_results=5):
     service = get_service()
 
     # Query to fetch emails from a specific sender
-    query = 'from: pinnacleinternational.ca'
+    query = 'list: Luxmore'
+    # query = 'from: luxmoreacct@gmail.com'
     results = service.users().messages().list(
         userId='me', 
         labelIds=['INBOX'], 

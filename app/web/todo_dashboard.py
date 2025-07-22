@@ -7,11 +7,26 @@ sys.path.append(str(root_path))
 
 import streamlit as st
 import time
-from app.services.todo_storage import load_all_todos, save_todos_to_file
+import app.services.gmail_client as gmail_client
+import app.services.todo_generator as todo_generator
+from app.services.todo_storage import load_all_todos, save_todo_to_file, save_todos_to_file
+from app.utils.voice import speak
+from scripts.daily_summary import generate_friendly_summary
 
 st.set_page_config(page_title="PropPilot Todo Dashboard", layout="centered")
 
 st.title("📝 PropPilot - Todo Dashboard")
+
+# ✅ Fetch & Parse Email Button
+if st.button("📬 Fetch Email and Generate ToDo"):
+    emails = gmail_client.fetch_recent_emails(max_results=1)
+    if emails:
+        todo = todo_generator.generate_todo_from_email(emails[0]['body'])
+        save_todo_to_file(todo)
+        st.success("✅ New ToDo generated from email!")
+        st.rerun()
+    else:
+        st.warning("No new emails found.")
 
 # Load todos
 todos = load_all_todos()
@@ -51,6 +66,12 @@ if st.button("Add Task"):
     save_todos_to_file(todos)
     st.success("Todo added.")
     st.rerun()
+
+# Assuming you already generated a friendly summary
+summary = generate_friendly_summary(todos)
+print(summary)
+if st.button("🔊 Play Summary"):
+    speak(summary)
 
 # Optionally show completed
 if completed_todos:

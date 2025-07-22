@@ -2,6 +2,9 @@ import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
+from openai import OpenAI
+client = OpenAI()
+
 from app.services.todo_storage import load_todos_for_today
 from datetime import datetime
 import smtplib
@@ -45,6 +48,20 @@ def generate_summary():
     for i, todo in enumerate(todos, 1):
         summary_lines.append(f"{i}. {todo['task']} (Due: {todo['due']})")
     return "\n".join(summary_lines)
+
+def generate_friendly_summary(todos: list) -> str:
+    tasks = "\n".join([f"- {t['task']} (due {t['due']})" for t in todos])
+    prompt = f"""
+You are an assistant. Summarize the following to-do list in a conversational tone as if you're talking to a busy property manager:
+
+{tasks}
+"""
+    response = client.chat.completions.create(
+        model="gpt-4o",
+        messages=[{"role": "user", "content": prompt}],
+        temperature=0.7
+    )
+    return response.choices[0].message.content.strip()
 
 if __name__ == "__main__":
     print(generate_summary())
